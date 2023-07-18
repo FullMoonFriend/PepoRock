@@ -21,9 +21,14 @@ PROJECTILE_COLOR = (255, 255, 255)
 PROJECTILE_SPEED = 10
 # Player images
 PLAYER_IMAGES = ['player.png', 'rainbow_peepo.png', 'player.png']
+# audio enabled global variable
+audio_enabled = True
 
+
+# Functions
 def select_player_icon(screen):
     icons = [pygame.image.load(image) for image in PLAYER_IMAGES]
+    icons = [pygame.transform.scale(icon, (70, 70)) for icon in icons]  # Scale down images
     selected_icon = 0
     font = pygame.font.Font(None, 36)
 
@@ -51,6 +56,18 @@ def select_player_icon(screen):
         pygame.display.flip()
 
         pygame.time.wait(100)
+
+# Function for muting / unmuting the sound
+# def toggle_sound():
+#     global audio_enabled # Use the global variable
+#     audio_enabled = not audio_enabled
+#     if audio_enabled:
+#         pygame.mixer.unpause()
+#         else:
+#         pygame.mixer.pause()
+
+
+# Classes
 
 class Projectile:
     def __init__(self, x, y):
@@ -138,6 +155,7 @@ def main():
     gun_sound = pygame.mixer.Sound('gun.wav')
     hit_sound = pygame.mixer.Sound('hit.wav')
     death_sound = pygame.mixer.Sound('death.wav')
+    audio_enabled = True
     ###
     
     
