@@ -1,5 +1,4 @@
-import pygame
-import sys
+import pygame, sys, time, random
 
 # Initialize Pygame
 pygame.init()
@@ -19,12 +18,14 @@ class Fighter:
         self.width = width
         self.height = height
         self.color = color
-        self.vel = 5  # Velocity for movement
+        self.vel = 1  # Velocity for movement
         self.punch_width = 20  # Width of the punch/kick
         self.health = 1000  # Health of the fighter
         self.punching = False  # Whether the fighter is punching
         self.kicking = False  # Whether the fighter is kicking
         self.hit = False  # Whether the fighter is hit
+        self.jump = False  # Whether the fighter is jumping
+        self.gravity = 0  # The speed of falling
 
     def draw(self, win):
         # Draw the fighter
@@ -44,6 +45,35 @@ class Fighter:
     def move_right(self):
         self.x += self.vel
 
+    def jump_up(self):
+        if not self.jump:  # If the fighter is not already jumping
+            self.jump = True
+            self.gravity = -10
+
+    def move(self, direction):
+        if direction == "left":
+            self.x -= self.vel
+        elif direction == "right":
+            self.x += self.vel
+        if self.jump:  # If the fighter is jumping
+            self.y += self.gravity  # Move up or down
+            self.gravity += 0.5  # Increase gravity (less negative or more positive)
+            if self.gravity > 10:  # Maximum falling speed
+                self.gravity = 10
+            if self.y > 500:  # If the fighter is on the ground
+                self.y = 500
+                self.jump = False  # Stop jumping
+                self.gravity = 0  # Reset gravity
+    def jump_gravity(self):
+        if self.jump:  # If the fighter is jumping
+            self.y += self.gravity  # Move up or down
+            self.gravity += 0.5  # Increase gravity (less negative or more positive)
+            if self.gravity > 10:  # Maximum falling speed
+                self.gravity = 10
+            if self.y > 500:  # If the fighter is on the ground
+                self.y = 500
+                self.jump = False  # Stop jumping
+                self.gravity = 0  # Reset gravity
     def punch(self, other):
         # The fighter is punching
         self.punching = True
@@ -77,6 +107,8 @@ fighter1 = Fighter(100, 500, 50, 100, (0, 0, 255))  # Blue fighter
 fighter2 = Fighter(650, 500, 50, 100, (255, 0, 0))  # Red fighter
 
 while True:
+    fighter1.jump_gravity()
+    fighter2.jump_gravity()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -90,6 +122,8 @@ while True:
                 fighter2.punch(fighter1)
             if event.key == pygame.K_DOWN:  # Fighter2 kick
                 fighter2.kick(fighter1)
+
+
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_w:  # Fighter1 stop punching
                 fighter1.punching = False
@@ -102,13 +136,17 @@ while True:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a]:  # Move fighter1 left
-        fighter1.move_left()
+        fighter1.move("left")
     if keys[pygame.K_d]:  # Move fighter1 right
-        fighter1.move_right()
+        fighter1.move("right")
     if keys[pygame.K_LEFT]:  # Move fighter2 left
-        fighter2.move_left()
+        fighter2.move("left")
     if keys[pygame.K_RIGHT]:  # Move fighter2 right
-        fighter2.move_right()
+        fighter2.move("right")
+    if keys[pygame.K_SPACE]:  # Jump fighter1
+        fighter1.jump_up()
+    if keys[pygame.K_RCTRL]:  # Jump fighter2
+        fighter2.jump_up()
 
     # Check for game over
     if fighter1.health <= 0 or fighter2.health <= 0:
@@ -129,5 +167,6 @@ while True:
 
     fighter1.hit = False
     fighter2.hit = False
+
 
     pygame.display.update()
