@@ -1,5 +1,6 @@
-import pygame
 import random
+
+import pygame
 
 # Screen dimensions
 SCREEN_WIDTH = 800
@@ -27,8 +28,7 @@ audio_enabled = True
 
 # Functions
 def select_player_icon(screen):
-    icons = [pygame.image.load(image) for image in PLAYER_IMAGES]
-    icons = [pygame.transform.scale(icon, (70, 70)) for icon in icons]  # Scale down images
+    icons = [pygame.image.load(f'resources/images/{image}') for image in PLAYER_IMAGES]
     selected_icon = 0
     font = pygame.font.Font(None, 36)
 
@@ -83,7 +83,7 @@ class Projectile:
 
 class Player:
     def __init__(self, image):
-        self.image = pygame.image.load(image)
+        self.image = pygame.image.load(f'resources/images/{image}')
         self.image = pygame.transform.scale(self.image, (PLAYER_WIDTH, PLAYER_HEIGHT)) 
         self.rect = self.image.get_rect()
         self.rect.x = SCREEN_WIDTH // 2
@@ -124,9 +124,11 @@ class Enemy:
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def draw(self, screen):
-        points = [(self.x, self.y), 
-                  (self.x + self.width // 2, self.y + self.height), 
-                  (self.x + self.width, self.y)]
+        points = [
+            (self.x, self.y), 
+            (self.x + self.width // 2, self.y + self.height), 
+            (self.x + self.width, self.y)
+        ]
         pygame.draw.polygon(screen, self.color, points)
 
     def update(self):
@@ -152,10 +154,10 @@ def main():
     font = pygame.font.Font(None, 36)  # Use the default font and a size of 36
     
     #### 
-    gun_sound = pygame.mixer.Sound('gun.wav')
-    hit_sound = pygame.mixer.Sound('hit.wav')
-    death_sound = pygame.mixer.Sound('death.wav')
-    audio_enabled = True
+    gun_sound = pygame.mixer.Sound('resources/sound/gun.wav')
+    hit_sound = pygame.mixer.Sound('resources/sound/hit.wav')
+    jump_sound = pygame.mixer.Sound('resources/sound/jump.wav')
+    death_sound = pygame.mixer.Sound('resources/sound/death.wav')
     ###
     
     
@@ -176,6 +178,7 @@ def main():
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
+                        pygame.mixer.Sound.play(jump_sound)
                         player.jump()
                     elif event.key == pygame.K_w:
                         pygame.mixer.Sound.play(gun_sound)
