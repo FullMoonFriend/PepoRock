@@ -108,9 +108,11 @@ class Enemy:
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def draw(self, screen):
-        points = [(self.x, self.y), 
-                  (self.x + self.width // 2, self.y + self.height), 
-                  (self.x + self.width, self.y)]
+        points = [
+            (self.x, self.y), 
+            (self.x + self.width // 2, self.y + self.height), 
+            (self.x + self.width, self.y)
+        ]
         pygame.draw.polygon(screen, self.color, points)
 
     def update(self):
@@ -138,6 +140,7 @@ def main():
     #### 
     gun_sound = pygame.mixer.Sound('resources/sound/gun.wav')
     hit_sound = pygame.mixer.Sound('resources/sound/hit.wav')
+    jump_sound = pygame.mixer.Sound('resources/sound/jump.wav')
     death_sound = pygame.mixer.Sound('resources/sound/death.wav')
     ###
     
@@ -159,6 +162,7 @@ def main():
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
+                        pygame.mixer.Sound.play(jump_sound)
                         player.jump()
                     elif event.key == pygame.K_w:
                         pygame.mixer.Sound.play(gun_sound)
