@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PepoRock", "PythonApplication1\PepoRock.pyproj", "{609AE434-2F21-45B2-8867-B28C212008B3}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PepoRock", "PepoRock.pyproj", "{609AE434-2F21-45B2-8867-B28C212008B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

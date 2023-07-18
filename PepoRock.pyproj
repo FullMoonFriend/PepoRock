@@ -6,12 +6,12 @@
     <ProjectHome>
     </ProjectHome>
     <StartupFile>PepoRock.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>resources</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>PepoRock</Name>
-    <RootNamespace>PythonApplication1</RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,12 +25,18 @@
     <Compile Include="PepoRock.py" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="death.wav" />
-    <Content Include="gun.wav" />
-    <Content Include="hit.wav" />
-    <Content Include="peepo.png" />
-    <Content Include="player.png" />
-    <Content Include="rainbow_peepo.png" />
+    <Content Include="resources\images\peepo.png" />
+    <Content Include="resources\images\player.png" />
+    <Content Include="resources\images\rainbow_peepo.png" />
+    <Content Include="resources\sound\death.wav" />
+    <Content Include="resources\sound\gun.wav" />
+    <Content Include="resources\sound\hit.wav" />
+    <Content Include="resources\sound\jump.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="resources\" />
+    <Folder Include="resources\images\" />
+    <Folder Include="resources\sound\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
