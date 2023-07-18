@@ -5,13 +5,14 @@
     <ProjectGuid>609ae434-2f21-45b2-8867-b28c212008b3</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>PepoRock.py</StartupFile>
+    <StartupFile>fight.py</StartupFile>
     <SearchPath>resources</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>PepoRock</Name>
     <RootNamespace>
     </RootNamespace>
+    <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +23,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="fight.py" />
     <Compile Include="PepoRock.py" />
   </ItemGroup>
   <ItemGroup>
@@ -37,6 +39,17 @@
     <Folder Include="resources\" />
     <Folder Include="resources\images\" />
     <Folder Include="resources\sound\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="env\">
+      <Id>env</Id>
+      <Version>3.11</Version>
+      <Description>env (Python 3.11 (64-bit))</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X64</Architecture>
+    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
