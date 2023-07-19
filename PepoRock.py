@@ -1,6 +1,8 @@
-import random
+import random, pygame, sqlalchemy
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
-import pygame
 
 # Screen dimensions
 SCREEN_WIDTH = 800
@@ -25,8 +27,42 @@ PLAYER_IMAGES = ['player.png', 'rainbow_peepo.png', 'player.png']
 # audio enabled global variable
 audio_enabled = True
 
+# Database connection
+engine = create_engine('sqlite:///peporock.db', echo=True)
+Base = declarative_base()
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Database classes (For highscores score and player name on the end screen)
+class PlayerScore(Base):
+    __tablename__ = 'PlayerScores'
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    name = sqlalchemy.Column(sqlalchemy.String)
+    score = sqlalchemy.Column(sqlalchemy.Integer)
+
+    def __repr__(self):
+        return f'PlayerScore(name={self.name}, score={self.score})'
+
+class HighScore(Base):
+    __tablename__ = 'highscores'
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    score = sqlalchemy.Column(sqlalchemy.Integer)
+
+    def __repr__(self):
+        return f'Highscore(score={self.score})'
+
+
 
 # Functions
+
+# returns the highest value score from the database (score is an integer)
+def get_high_score():
+    high_score = session.query(PlayerScore).order_by(PlayerScore.score.desc()).first()
+    if high_score is None:
+        return PlayerScore(score=0, name='None')
+    else:
+        return high_score
+
 def select_player_icon(screen):
     icons = [pygame.image.load(f'resources/images/{image}') for image in PLAYER_IMAGES]
     selected_icon = 0
@@ -162,13 +198,22 @@ def main():
     
     
     
-    high_score = 0
+    # set the high score to the highest score in the peporock.db database
+    high_score = get_high_score()
+    
     running = True
     while running:
         player = Player(player_image)
         enemies = []
         projectiles = []
         score = 0
+                # If the current score is higher than the high score, update the high score
+        if score > high_score.score:
+            high_score.score = score
+            session.add(HighScore(score=high_score.score))
+            session.commit()
+        
+        screen.fill((0, 0, 0))
 
         game_over = False
         while not game_over:
@@ -226,33 +271,101 @@ def main():
             # Draw the score and high score
             score_text = font.render(f"Score: {score}", True, (255, 255, 255))
             screen.blit(score_text, (20, 20))
-            high_score_text = font.render(f"High Score: {high_score}", True, (255, 255, 255))
-            screen.blit(high_score_text, (SCREEN_WIDTH - 200, 20))
+            high_score_text = font.render(f"High Score: {high_score.name} {high_score.score}", True, (255, 255, 255))
+            screen.blit(high_score_text, (SCREEN_WIDTH - 250, 20))
 
             pygame.display.flip()
 
             clock.tick(60)
 
-        # Update the high score
-        if score > high_score:
-            high_score = score
+        # Save the high score to the database file defined above engine = create_engine('sqlite:///peporock.db', echo=True)
+        engine = create_engine('sqlite:///peporock.db', echo=True)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        # create the table if it doesn't exist, first
+        if not engine.dialect.has_table(engine.connect(), 'high_scores'):
+            Base.metadata.create_all(bind=engine)
+        # Add the high score to the database
+        session.add(HighScore(score=high_score.score))
+        session.commit()
+        screen.fill((0, 0, 0))
+        # Before showing the game over screen, let the user enter their initials (to be saved with in the Player table of the database)
+        # Display the input in pygame, not the console
 
+        enter_initials_text = font.render("Enter your initials:", True, (255, 255, 255))
+        initials_prompt_x = SCREEN_WIDTH // 2 - enter_initials_text.get_width() // 2  # Save the x-coordinate for later
+        initials_prompt_y = SCREEN_HEIGHT // 2 - enter_initials_text.get_height() // 2
+        screen.blit(enter_initials_text, (initials_prompt_x, initials_prompt_y))
+        pygame.display.flip()
+
+        # Capture the user's initials as keyboard input
+        initials = ""
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.unicode.isalpha():  # We only want to capture up to 3 alphabetic characters
+                        if len(initials) < 3:
+                            initials += event.unicode
+                            # Redraw the text including the new character
+                            screen.fill((0, 0, 0))
+                            screen.blit(enter_initials_text, (initials_prompt_x, initials_prompt_y))
+                            initials_text = font.render(initials, True, (255, 255, 255))
+                            screen.blit(initials_text, (initials_prompt_x, initials_prompt_y + enter_initials_text.get_height()))  # Display the initials just below the prompt
+                            pygame.display.flip()
+                        elif event.key == pygame.K_BACKSPACE:
+                            initials = initials[:-1]
+                            # Redraw the text without the last character
+                            screen.fill((0, 0, 0))
+                            screen.blit(enter_initials_text, (initials_prompt_x, initials_prompt_y))
+                            initials_text = font.render(initials, True, (255, 255, 255))
+                            screen.blit(initials_text, (initials_prompt_x, initials_prompt_y + enter_initials_text.get_height()))  # Display the initials just below the prompt
+                            pygame.display.flip()
+                    elif event.key == pygame.K_RETURN:  # The user has finished entering their initials
+                        running = False
+
+        # if the user entered initials, add them to the database
+        if initials:
+            session.add(PlayerScore(name=initials, score=score))
+            session.commit()
+
+        # Load the high score(s) from the database) with the existing session 
+        high_scores = session.query(HighScore).all()
         # Ask the player if they want to play again
-        # Ask the player if they want to play again
+        # Ask the player if they want to play again, while displaying the high score
         while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    break
             pygame.event.pump()  # Update event queue
             keys = pygame.key.get_pressed()
             if keys[pygame.K_y]:
+
                 break
             elif keys[pygame.K_n]:
                 running = False
                 break
 
+
+            # Clear the screen and display the game over text, player score, and high score and ask the player if they want to play again
             screen.fill((0, 0, 0))
-            game_over_text = font.render("Game Over! Play again? (y/n)", True, (255, 255, 255))
+            # Draw the score and high score
+            score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+            screen.blit(score_text, (20, 20))
+            high_score_text = font.render(f"High Score: {high_score}", True, (255, 255, 255))
+            screen.blit(high_score_text, (SCREEN_WIDTH - 200, 20))
+            # Draw the game over text
+            game_over_text = font.render("Game Over", True, (255, 255, 255))
             screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, SCREEN_HEIGHT // 2 - game_over_text.get_height() // 2))
             pygame.display.flip()
-
+            # Ask the player if they want to play again
+            play_again_text = font.render("Play Again? (y/n)", True, (255, 255, 255))
+            screen.blit(play_again_text, (SCREEN_WIDTH // 2 - play_again_text.get_width() // 2, SCREEN_HEIGHT // 2 - play_again_text.get_height() // 2 + 50))
+            pygame.display.flip()
+            
             clock.tick(60)
 
 
