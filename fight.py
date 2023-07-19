@@ -1,4 +1,4 @@
-import pygame, sys, time, random
+import pygame, sys
 
 # Initialize Pygame
 pygame.init()
@@ -17,6 +17,8 @@ class Fighter:
         self.y = y
         self.width = width
         self.height = height
+        self.original_height = height  # Store the original height
+        self.original_y = y  # Store the original y position
         self.color = color
         self.vel = 1  # Velocity for movement
         self.punch_width = 20  # Width of the punch/kick
@@ -45,6 +47,14 @@ class Fighter:
     def move_right(self):
         self.x += self.vel
 
+    def crouchToggle(self):
+        if self.height == self.original_height:
+            self.height = self.height // 2 
+            self.y = self.original_y + self.height  # Adjust y position when crouching
+        else:
+            self.y = self.original_y  # Reset y position when standing up
+            self.height = self.original_height
+    # Jumping method
     def jump_up(self):
         if not self.jump:  # If the fighter is not already jumping
             self.jump = True
@@ -135,6 +145,7 @@ while True:
                 fighter2.kicking = False
 
     keys = pygame.key.get_pressed()
+    # Move fighters
     if keys[pygame.K_a]:  # Move fighter1 left
         fighter1.move("left")
     if keys[pygame.K_d]:  # Move fighter1 right
@@ -143,6 +154,13 @@ while True:
         fighter2.move("left")
     if keys[pygame.K_RIGHT]:  # Move fighter2 right
         fighter2.move("right")
+    # Crouch fighters
+    if keys[pygame.K_LCTRL]:  # Crouch fighter1
+        fighter1.crouchToggle()
+    if keys[pygame.K_RSHIFT]:  # Crouch fighter2
+        fighter2.crouchToggle()
+
+    # Jump fighters
     if keys[pygame.K_SPACE]:  # Jump fighter1
         fighter1.jump_up()
     if keys[pygame.K_RCTRL]:  # Jump fighter2
