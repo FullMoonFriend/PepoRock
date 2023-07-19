@@ -21,7 +21,7 @@ ENEMY_SPEED = 5
 PROJECTILE_COLOR = (255, 255, 255)
 PROJECTILE_SPEED = 10
 # Player images
-PLAYER_IMAGES = ['player.png', 'rainbow_peepo.png', 'player.png']
+PLAYER_IMAGES = ['peepoRainbow.png', 'peepoBlush.png', 'peepoMaga.png', 'peepoCozy.png', 'peepoFat.png', 'peepoRiot.png', 'peepoFancy.png', 'peepoToilet.png', 'peepoCheer.png', 'peepoFat.png', 'peepoHug.png', 'peepoClown.png', 'peepoPog.png', 'peepoGlad.png', 'peepoWTF.png']
 # audio enabled global variable
 audio_enabled = True
 
@@ -31,6 +31,15 @@ def select_player_icon(screen):
     icons = [pygame.image.load(f'resources/images/{image}') for image in PLAYER_IMAGES]
     selected_icon = 0
     font = pygame.font.Font(None, 36)
+    filename_font = pygame.font.Font(None, 24)  # Font for displaying filenames
+    
+    # Normalize icon sizes to a fixed width and height
+    ICON_WIDTH, ICON_HEIGHT = 100, 100  # Adjust this to your preferred dimensions
+    icons = [pygame.transform.scale(icon, (ICON_WIDTH, ICON_HEIGHT)) for icon in icons]
+    
+    # Calculate how many icons can fit in a row and the number of rows required
+    icons_per_row = (SCREEN_WIDTH - 10) // (ICON_WIDTH + 10)
+    num_rows = (len(icons) - 1) // icons_per_row + 1
 
     while True:
         for event in pygame.event.get():
@@ -45,15 +54,30 @@ def select_player_icon(screen):
                     return PLAYER_IMAGES[selected_icon]
 
         screen.fill((0, 0, 0))
-        text = font.render("Choose your champion!", True, (255, 255, 255))
+        text = font.render("Choose your Peepo!", True, (255, 255, 255))
         screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 20))
+        
         for i, icon in enumerate(icons):
-            x = SCREEN_WIDTH // 2 - len(icons) * icon.get_width() // 2 + i * icon.get_width() + i * 10
-            y = SCREEN_HEIGHT // 2 - icon.get_height() // 2
+            row = i // icons_per_row
+            col = i % icons_per_row
+            x = 10 + col * (ICON_WIDTH + 10)
+            y = (SCREEN_HEIGHT - num_rows * ICON_HEIGHT) // 2 + row * ICON_HEIGHT + row * 10
             screen.blit(icon, (x, y))
+            
+            # Display the filename below the icon, stripping the '.png' extension and the 'peepo' from the front of the filename
+            filename_text = filename_font.render(PLAYER_IMAGES[i][5:-4], True, (255, 255, 255))
+            filename_x = x + (ICON_WIDTH - filename_text.get_width()) // 2
+            filename_y = y + ICON_HEIGHT + 5  # 5 pixels below the icon
+            screen.blit(filename_text, (filename_x, filename_y))
+            
+            # Adjusting the rectangle's position and size
             if i == selected_icon:
-                pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(x, y, icon.get_width(), icon.get_height()), 2)
+                pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(x-2, y-2, ICON_WIDTH+4, ICON_HEIGHT+4), 2)
+        
         pygame.display.flip()
+
+
+
 
         pygame.time.wait(100)
 

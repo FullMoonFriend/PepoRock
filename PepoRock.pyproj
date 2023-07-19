@@ -5,14 +5,14 @@
     <ProjectGuid>609ae434-2f21-45b2-8867-b28c212008b3</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>fight.py</StartupFile>
+    <StartupFile>PepoRock.py</StartupFile>
     <SearchPath>resources</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>PepoRock</Name>
     <RootNamespace>
     </RootNamespace>
-    <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>MSBuild|env1|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,9 +27,23 @@
     <Compile Include="PepoRock.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="requirements.txt" />
     <Content Include="resources\images\peepo.png" />
-    <Content Include="resources\images\player.png" />
-    <Content Include="resources\images\rainbow_peepo.png" />
+    <Content Include="resources\images\peepoBlush.png" />
+    <Content Include="resources\images\peepoCheer.png" />
+    <Content Include="resources\images\peepoClown.png" />
+    <Content Include="resources\images\peepoCozy.png" />
+    <Content Include="resources\images\peepoFancy.png" />
+    <Content Include="resources\images\peepoFat.png" />
+    <Content Include="resources\images\peepoGlad.png" />
+    <Content Include="resources\images\peepoHug.png" />
+    <Content Include="resources\images\peepoLove.png" />
+    <Content Include="resources\images\peepoMaga.png" />
+    <Content Include="resources\images\peepoPog.png" />
+    <Content Include="resources\images\peepoRiot.png" />
+    <Content Include="resources\images\peepoToilet.png" />
+    <Content Include="resources\images\peepoWTF.png" />
+    <Content Include="resources\images\peepoRainbow.png" />
     <Content Include="resources\sound\death.wav" />
     <Content Include="resources\sound\gun.wav" />
     <Content Include="resources\sound\hit.wav" />
@@ -41,6 +55,15 @@
     <Folder Include="resources\sound\" />
   </ItemGroup>
   <ItemGroup>
+    <Interpreter Include="env1\">
+      <Id>env1</Id>
+      <Version>3.11</Version>
+      <Description>env1 (Python 3.11 (64-bit))</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X64</Architecture>
+    </Interpreter>
     <Interpreter Include="env\">
       <Id>env</Id>
       <Version>3.11</Version>
