@@ -97,19 +97,24 @@ class PowerUp:
         self.x = x
         self.y = y
         self.speed = ENEMY_SPEED  # Use the same speed as enemies for simplicity
-        self.radius = 25  # Radius of the power-up circle
         self.duration = 5000  # Duration for which the power-up remains active (in milliseconds)
-        self.color = {
-            'speed': (0, 0, 255),
-            'shield': (0, 255, 0),
-            'multi-shot': (255, 255, 0)
-        }[kind]
+
+        # Load and scale the power-up image
+        if self.kind == 'multi-shot':
+            self.image = pygame.image.load('resources/images/multishot.png')
+            self.image = pygame.transform.scale(self.image, (50, 50))  # Adjust size as needed
+        # After loading and scaling the image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (self.x, self.y)
 
     def draw(self, screen):
-        pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius)
-
+        if self.kind == 'multi-shot':
+            screen.blit(self.image, (self.x, self.y))
+    
     def update(self):
         self.y += self.speed
+        self.rect.topleft = (self.x, self.y)  # Update the rect position
+
 
 class Projectile:
     def __init__(self, x, y):
@@ -217,11 +222,13 @@ def main():
     power_ups = []
     active_power_up = None
     power_up_start_time = None
+    high_score = 0
+    multi_shot_count = 1
 
     
     
-    high_score = 0
     running = True
+    
     while running:
         pygame.mixer.music.play(-1)  # Play the music on loop
         player = Player(player_image)
@@ -242,8 +249,9 @@ def main():
                     elif event.key == pygame.K_w:
                         pygame.mixer.Sound.play(gun_sound)
                         if active_power_up == 'multi-shot':
-                            projectiles.append(Projectile(player.rect.x + PLAYER_WIDTH // 4, player.rect.y))
-                            projectiles.append(Projectile(player.rect.x + 3 * PLAYER_WIDTH // 4, player.rect.y))
+                            for i in range(multi_shot_count):
+                                offset = (i - (multi_shot_count - 1) / 2) * PLAYER_WIDTH / (multi_shot_count + 1)
+                                projectiles.append(Projectile(player.rect.x + PLAYER_WIDTH // 2 + offset, player.rect.y))
                         else:
                             projectiles.append(Projectile(player.rect.x + PLAYER_WIDTH // 2, player.rect.y))
 
@@ -259,10 +267,15 @@ def main():
 
             for power_up in power_ups:
                 power_up.update()
-                if player.rect.collidepoint((power_up.x, power_up.y)):
-                    active_power_up = 'multi-shot'
+                if player.rect.colliderect(power_up.rect):
+                    if active_power_up == 'multi-shot':
+                        multi_shot_count += 1
+                    else:
+                        active_power_up = 'multi-shot'
+                        multi_shot_count = 2
                     power_up_start_time = pygame.time.get_ticks()
                     power_ups.remove(power_up)
+
 
 
             if random.random() < 0.01:
@@ -319,6 +332,8 @@ def main():
         # Update the high score
         if score > high_score:
             high_score = score
+        # Reset the multi-shot power-up
+        multi_shot_count = 1
 
         # Ask the player if they want to play again
         while True:
