@@ -1,5 +1,4 @@
 import random
-
 import pygame
 
 # Screen dimensions
@@ -127,20 +126,21 @@ class Player:
         if not self.is_jumping:
             self.is_jumping = True
             self.jump_height = 10
+    
 
     def update(self):
         if self.is_jumping:
             self.rect.y -= self.jump_height
             self.jump_height -= 1
             if self.jump_height < -10:
-                self.is_jumping = False
+                self.is_jumping = Falsen
                 self.rect.y = SCREEN_HEIGHT - self.rect.height - 10
 
 
 class Enemy:
     def __init__(self):
         self.width = ENEMY_WIDTH
-        self.height = ENEMY_HEIGHT
+        self.height = ENEMY_HEIGHT 
         self.color = ENEMY_COLOR
         self.x = random.randint(0, SCREEN_WIDTH - self.width)
         self.y = -self.height
@@ -178,6 +178,8 @@ def main():
     font = pygame.font.Font(None, 36)  # Use the default font and a size of 36
     
     #### 
+    # Load the sounds and music
+    music = pygame.mixer.music.load('resources/sound/music.wav')
     gun_sound = pygame.mixer.Sound('resources/sound/gun.wav')
     hit_sound = pygame.mixer.Sound('resources/sound/hit.wav')
     jump_sound = pygame.mixer.Sound('resources/sound/jump.wav')
@@ -189,6 +191,7 @@ def main():
     high_score = 0
     running = True
     while running:
+        pygame.mixer.music.play(-1)  # Play the music on loop
         player = Player(player_image)
         enemies = []
         projectiles = []
