@@ -91,6 +91,25 @@ def select_player_icon(screen):
 
 
 # Classes
+class PowerUp:
+    def __init__(self, kind, x, y):
+        self.kind = kind
+        self.x = x
+        self.y = y
+        self.speed = ENEMY_SPEED  # Use the same speed as enemies for simplicity
+        self.radius = 25  # Radius of the power-up circle
+        self.duration = 5000  # Duration for which the power-up remains active (in milliseconds)
+        self.color = {
+            'speed': (0, 0, 255),
+            'shield': (0, 255, 0),
+            'multi-shot': (255, 255, 0)
+        }[kind]
+
+    def draw(self, screen):
+        pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius)
+
+    def update(self):
+        self.y += self.speed
 
 class Projectile:
     def __init__(self, x, y):
@@ -133,7 +152,7 @@ class Player:
             self.rect.y -= self.jump_height
             self.jump_height -= 1
             if self.jump_height < -10:
-                self.is_jumping = Falsen
+                self.is_jumping = False
                 self.rect.y = SCREEN_HEIGHT - self.rect.height - 10
 
 
@@ -161,6 +180,15 @@ class Enemy:
 
         
 def main():
+    """
+    The main function that runs the game loop for PepoRock.
+
+    Initializes Pygame and loads the game resources, including sounds and music.
+    Displays the game screen and handles user input.
+    Updates the game state and score based on user input and enemy collisions.
+    Displays the score and high score on the screen.
+    Asks the player if they want to play again after the game is over.
+    """
     pygame.init()
     try:
         pygame.mixer.init()  # Initialize the mixer
@@ -185,7 +213,11 @@ def main():
     jump_sound = pygame.mixer.Sound('resources/sound/jump.wav')
     death_sound = pygame.mixer.Sound('resources/sound/death.wav')
     ###
-    
+    # initialize the power-ups
+    power_ups = []
+    active_power_up = None
+    power_up_start_time = None
+
     
     
     high_score = 0
@@ -209,13 +241,29 @@ def main():
                         player.jump()
                     elif event.key == pygame.K_w:
                         pygame.mixer.Sound.play(gun_sound)
-                        projectiles.append(Projectile(player.rect.x + PLAYER_WIDTH // 2, player.rect.y))
+                        if active_power_up == 'multi-shot':
+                            projectiles.append(Projectile(player.rect.x + PLAYER_WIDTH // 4, player.rect.y))
+                            projectiles.append(Projectile(player.rect.x + 3 * PLAYER_WIDTH // 4, player.rect.y))
+                        else:
+                            projectiles.append(Projectile(player.rect.x + PLAYER_WIDTH // 2, player.rect.y))
+
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
                 player.move(-1)
             elif keys[pygame.K_RIGHT]:
                 player.move(1)
+
+            if random.random() < 0.005:  # Adjust this probability as needed
+                power_ups.append(PowerUp('multi-shot', random.randint(0, SCREEN_WIDTH - 50), 0))
+
+            for power_up in power_ups:
+                power_up.update()
+                if player.rect.collidepoint((power_up.x, power_up.y)):
+                    active_power_up = 'multi-shot'
+                    power_up_start_time = pygame.time.get_ticks()
+                    power_ups.remove(power_up)
+
 
             if random.random() < 0.01:
                 enemies.append(Enemy())
@@ -240,6 +288,7 @@ def main():
 
             player.update()
 
+
             for projectile in projectiles:
                 projectile.update()
 
@@ -247,8 +296,15 @@ def main():
             player.draw(screen)
             for enemy in enemies:
                 enemy.draw(screen)
+            for power_up in power_ups:
+                power_up.draw(screen)
             for projectile in projectiles:
                 projectile.draw(screen)
+
+            # Check powerup timer
+            if active_power_up and pygame.time.get_ticks() - power_up_start_time > power_up.duration:
+                active_power_up = None
+
 
             # Draw the score and high score
             score_text = font.render(f"Score: {score}", True, (255, 255, 255))
@@ -264,7 +320,6 @@ def main():
         if score > high_score:
             high_score = score
 
-        # Ask the player if they want to play again
         # Ask the player if they want to play again
         while True:
             pygame.event.pump()  # Update event queue
