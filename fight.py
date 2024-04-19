@@ -11,8 +11,8 @@ SCREEN_HEIGHT = info.current_h
 # Create the screen object
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-peepo_left = pygame.image.load('resources/images/transleftpeepo.png').convert_alpha()
-peepo_right = pygame.image.load('resources/images/peeporight.png').convert_alpha()
+peepo_left = pygame.image.load('resources/images/peeporight.png').convert_alpha()
+peepo_right = pygame.image.load('resources/images/transleftpeepo.png').convert_alpha()
 stage = pygame.image.load('resources/images/fightstage.png').convert_alpha()
 
 
@@ -210,15 +210,18 @@ class Fighter:
 def draw_health_bar(win, fighter, x, y):
     if fighter.health < 0:
         fighter.health = 0
-    pygame.draw.rect(win, (255,0,0), (x, y, 100, 10))
-    pygame.draw.rect(win, (0,255,0), (x, y, fighter.health/10, 10))  # Scale health down for drawing
+    bar_width = SCREEN_WIDTH * 0.1  # 10% of screen width
+    bar_height = SCREEN_HEIGHT * 0.02  # 2% of screen height
+    pygame.draw.rect(win, (255,0,0), (x, y, bar_width, bar_height))
+    pygame.draw.rect(win, (0,255,0), (x, y, fighter.health/1000 * bar_width, bar_height))
+
 
 # Create fighters
 # fighter4 = Fighter(100, 500, 50, 100, (0, 0, 255))  # Blue fighter
 # fighter3 = Fighter(400, 500, 50, 100, (0, 255, 0))  # Green fighter
 # yellow fighter
-fighter1 = Fighter(100, 500, 50, 100, (0, 0, 255), peepo_left)  # Passing the image for fighter1
-fighter2 = Fighter(650, 500, 50, 100, (255, 0, 0), peepo_right)  # Passing the image for fighter2
+fighter1 = Fighter(SCREEN_WIDTH * 0.1, SCREEN_HEIGHT * 0.83, 50, 100, (0, 0, 255), peepo_left)
+fighter2 = Fighter(SCREEN_WIDTH * 0.81, SCREEN_HEIGHT * 0.83, 50, 100, (255, 0, 0), peepo_right)
 
 active_hadookens_player1 = []
 active_hadookens_player2 = []
@@ -314,8 +317,8 @@ while True:
     fighter2.draw(screen)
 
     # Draw the health bars
-    draw_health_bar(screen, fighter1, 50, 50)
-    draw_health_bar(screen, fighter2, 650, 50)
+    draw_health_bar(screen, fighter1, SCREEN_WIDTH * 0.05, SCREEN_HEIGHT * 0.05)
+    draw_health_bar(screen, fighter2, SCREEN_WIDTH * 0.8, SCREEN_HEIGHT * 0.05)
 
     fighter1.hit = False
     fighter2.hit = False
