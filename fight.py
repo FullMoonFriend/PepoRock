@@ -3,13 +3,18 @@ import pygame, sys
 # Initialize Pygame
 pygame.init()
 
-# Define constants for the screen width and height
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+# Determine max screen size and set up display
+info = pygame.display.Info()
+SCREEN_WIDTH = info.current_w
+SCREEN_HEIGHT = info.current_h
 
 # Create the screen object
-# The size is determined by the constant screen size
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+peepo_left = pygame.image.load('resources/images/transleftpeepo.png').convert_alpha()
+peepo_right = pygame.image.load('resources/images/peeporight.png').convert_alpha()
+stage = pygame.image.load('resources/images/fightstage.png').convert_alpha()
+
 
 class Hadooken:
         def __init__(self, x, y, width, height, color):
@@ -98,7 +103,7 @@ class Shoryuken:
 
 
 class Fighter:
-    def __init__(self, x, y, width, height, color):
+    def __init__(self, x, y, width, height, color, image):
         self.x = x
         self.y = y
         self.width = width
@@ -107,7 +112,8 @@ class Fighter:
         self.original_height = height  # Store the original height
         self.original_y = y  # Store the original y position
         self.color = color
-        self.vel = 10  # Velocity for movement
+        self.image = image  # Store the image
+        self.vel = 1  # Velocity for movement
         self.punch_width = 20  # Width of the punch/kick
         self.health = 1000  # Health of the fighter
         self.punching = False  # Whether the fighter is punching
@@ -117,16 +123,14 @@ class Fighter:
         self.gravity = 0  # The speed of falling
     
     def draw(self, win):
-        # Draw the fighter
-        pygame.draw.rect(win, (255, 0, 0) if self.hit else self.color, (self.x, self.y, self.width, self.height))
+        # Draw the fighter using the image
+        screen.blit(self.image, (self.x, self.y))
 
-        # Draw the punch if the fighter is punching
+        # Punching and kicking can be indicated with additional rectangles or images
         if self.punching:
-            pygame.draw.rect(win, self.color, (self.x + self.width, self.y, self.punch_width, self.height // 2))
-
-        # Draw the kick if the fighter is kicking
+            pygame.draw.rect(screen, self.color, (self.x + self.width, self.y, self.punch_width, self.height // 2))
         if self.kicking:
-            pygame.draw.rect(win, self.color, (self.x + self.width, self.y + self.height // 2, self.punch_width, self.height // 2))
+            pygame.draw.rect(screen, self.color, (self.x + self.width, self.y + self.height // 2, self.punch_width, self.height // 2))
 
     def move_left(self):
         self.x -= self.vel
@@ -210,11 +214,11 @@ def draw_health_bar(win, fighter, x, y):
     pygame.draw.rect(win, (0,255,0), (x, y, fighter.health/10, 10))  # Scale health down for drawing
 
 # Create fighters
-fighter4 = Fighter(100, 500, 50, 100, (0, 0, 255))  # Blue fighter
-fighter2 = Fighter(650, 500, 50, 100, (255, 0, 0))  # Red fighter
-fighter3 = Fighter(400, 500, 50, 100, (0, 255, 0))  # Green fighter
+# fighter4 = Fighter(100, 500, 50, 100, (0, 0, 255))  # Blue fighter
+# fighter3 = Fighter(400, 500, 50, 100, (0, 255, 0))  # Green fighter
 # yellow fighter
-fighter1 = Fighter(400, 500, 50, 100, (255, 255, 0)) # yellow fighter
+fighter1 = Fighter(100, 500, 50, 100, (0, 0, 255), peepo_left)  # Passing the image for fighter1
+fighter2 = Fighter(650, 500, 50, 100, (255, 0, 0), peepo_right)  # Passing the image for fighter2
 
 active_hadookens_player1 = []
 active_hadookens_player2 = []
@@ -285,7 +289,7 @@ while True:
         sys.exit()
 
     # Fill the screen with black
-    screen.fill((0, 0, 0))
+    screen.blit(stage, (0, 0))
         # Update and draw Hadooken projectiles
     # Update and draw Hadooken projectiles
     updated_hadookens_player1 = []
